@@ -13,7 +13,7 @@ app.use(express.json());
 
 // Global Variables
 const dataPath = path.resolve(__dirname, './dev-data/data/tours-simple.json');
-const tours = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+let tours = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
 // Routes
 app.get('/api/v1/tours', (req, res) => {
@@ -68,6 +68,63 @@ app.post('/api/v1/tours', async (req, res) => {
   } catch {
     res.end('Error Occured');
   }
+});
+
+app.delete('/api/v1/tours/:id', async (req, res) => {
+  const { id } = req.params;
+  const prevLength = tours.length;
+  tours = tours.filter(el => el.id != id);
+
+  if (prevLength !== tours.length) {
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours: tours,
+      },
+    });
+
+    await writeFile(dataPath, JSON.stringify(tours), 'utf-8');
+
+    return;
+  }
+
+  res.status(404 /*404 means Not Found*/).json({
+    status: 'fail',
+    data: `Not Found (#${id})`,
+  });
+});
+
+app.patch('/api/v1/tours/:id', async (req, res) => {
+  const { id } = req.params;
+  let tour = tours.find(el => el.id == id);
+
+  if (!tour) {
+    res.status(404 /*404 means Not Found*/).json({
+      status: 'fail',
+      data: `Not Found (#${id})`,
+    });
+
+    return;
+  }
+
+  tours = tours.map(tour => {
+    return tour.id == id
+      ? {
+          ...tour,
+          ...req.body,
+        }
+      : tour;
+  });
+
+  tour = tours.find(el => el.id == id);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      ...tour,
+    },
+  });
 });
 
 // Boiler Plate
