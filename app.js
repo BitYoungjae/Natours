@@ -125,6 +125,8 @@ app.patch('/api/v1/tours/:id', async (req, res) => {
       ...tour,
     },
   });
+
+  await writeFile(dataPath, JSON.stringify(tours), 'utf-8');
 });
 
 // Boiler Plate
