@@ -15,8 +15,8 @@ app.use(express.json());
 const dataPath = path.resolve(__dirname, './dev-data/data/tours-simple.json');
 let tours = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
-// Routes
-app.get('/api/v1/tours', (req, res) => {
+// Route handlers
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -24,9 +24,9 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
+};
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
   const { id } = req.params;
   const tour = tours.find(el => el.id == id);
 
@@ -45,9 +45,9 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
+};
 
-app.post('/api/v1/tours', async (req, res) => {
+const createTour = async (req, res) => {
   const newId = tours[tours.length - 1].id + 1;
 
   const newTour = {
@@ -68,9 +68,9 @@ app.post('/api/v1/tours', async (req, res) => {
   } catch {
     res.end('Error Occured');
   }
-});
+};
 
-app.delete('/api/v1/tours/:id', async (req, res) => {
+const deleteTour = async (req, res) => {
   const { id } = req.params;
   const prevLength = tours.length;
   tours = tours.filter(el => el.id != id);
@@ -93,9 +93,9 @@ app.delete('/api/v1/tours/:id', async (req, res) => {
     status: 'fail',
     data: `Not Found (#${id})`,
   });
-});
+};
 
-app.patch('/api/v1/tours/:id', async (req, res) => {
+const updateTour = async (req, res) => {
   const { id } = req.params;
   let tour = tours.find(el => el.id == id);
 
@@ -127,7 +127,19 @@ app.patch('/api/v1/tours/:id', async (req, res) => {
   });
 
   await writeFile(dataPath, JSON.stringify(tours), 'utf-8');
-});
+};
+
+// routes
+app
+  .route('/api/v1/tours/')
+  .get(getAllTours)
+  .post(createTour);
+
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .delete(deleteTour)
+  .patch(updateTour);
 
 // Boiler Plate
 const port = 3000;
