@@ -2,6 +2,7 @@ import fs, { promises } from 'fs';
 import path from 'path';
 import express from 'express';
 import { getPathNames } from 'esm-pathnames';
+import morgan from 'morgan';
 
 const { writeFile } = promises;
 const { __dirname } = getPathNames(import.meta);
@@ -9,7 +10,13 @@ const { __dirname } = getPathNames(import.meta);
 const app = express();
 
 // Use middlewares
+app.use(morgan('dev'));
 app.use(express.json());
+
+app.use((req, res, next) => {
+  req.date = Date.now();
+  next();
+});
 
 // Global Variables
 const dataPath = path.resolve(__dirname, './dev-data/data/tours-simple.json');
