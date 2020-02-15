@@ -7,11 +7,13 @@ import {
   createTour,
   checkBody,
   checkId,
-} from '../controllers/tours.js';
+  checkIsIn,
+} from '../controllers/toursHandler.js';
 
 const router = express.Router();
 
 router.param('id', checkId);
+router.param('id', checkIsIn);
 
 router
   .route('/')

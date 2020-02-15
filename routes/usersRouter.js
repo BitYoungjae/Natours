@@ -3,7 +3,7 @@ import express from 'express';
 import { 
   getAllUsers,
   createUser 
-} from '../controllers/users.js';
+} from '../controllers/usersHandler.js';
 
 const router = express.Router();
 router

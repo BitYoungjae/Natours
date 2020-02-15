@@ -9,7 +9,7 @@ const dataPaths = {
   users: path.resolve(__dirname, './dev-data/data/users.json'),
 };
 
-let tours = JSON.parse(fs.readFileSync(dataPaths.tours, 'utf-8'));
-let users = JSON.parse(fs.readFileSync(dataPaths.users, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(dataPaths.tours, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(dataPaths.users, 'utf-8'));
 
 export { tours, users, dataPaths };

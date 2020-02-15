@@ -1,7 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
-import tourRouter from './routes/tours.js';
-import userRouter from './routes/users.js';
+import tourRouter from './routes/toursRouter.js';
+import userRouter from './routes/usersRouter.js';
 
 const app = express();
 
