@@ -4,7 +4,8 @@ Natours API made by own way
 
 ## NPM Scripts
 
-- npm start - start the server
+- npm start - start the server in production mode
+- npm run dev - start the sever in development mode
 - npm run recover - recover dev data
 
 ## APIs
