@@ -1,5 +1,6 @@
 import { promises } from 'fs';
 import { tours, dataPaths } from '../data.js';
+import { sendFail, sendSuccess } from '../lib/jsend.js';
 
 const { writeFile } = promises;
 const { tours: tourPath } = dataPaths;
@@ -20,18 +21,6 @@ export {
 
 const writeTours = () =>
   writeFile(tourPath, JSON.stringify(cachedTours), 'utf-8');
-
-const sendFail = (res, msg, statusCode = 400) =>
-  res.status(statusCode).json({
-    status: 'fail',
-    message: msg,
-  });
-
-const sendSuccess = (res, data, statusCode = 200) =>
-  res.status(statusCode).json({
-    status: 'success',
-    data,
-  });
 
 const checkId = (req, res, next, val) => {
   const isNum = /^[0-9]+$/.test(val);
