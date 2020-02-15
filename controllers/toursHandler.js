@@ -75,7 +75,7 @@ const deleteTour = async (req, res) => {
   cachedTours = cachedTours.filter(el => el.id != id);
 
   sendSuccess(res, cachedTours, 200);
-  await writeTours();
+  writeTours(); // do not have to 'await' because all handlers deals toursData as a variable
 };
 
 const updateTour = async (req, res) => {
@@ -89,5 +89,5 @@ const updateTour = async (req, res) => {
   });
 
   sendSuccess(res, { ...req.tour, ...req.body });
-  await writeTours();
+  writeTours();
 };
