@@ -7,18 +7,6 @@ const { tours: tourPath } = dataPaths;
 
 let cachedTours = tours;
 
-// prettier-ignore
-export { 
-  getAllTours, 
-  getTour, 
-  createTour, 
-  updateTour, 
-  deleteTour, 
-  checkBody,
-  checkId,
-  checkIsIn,
-};
-
 const writeTours = () =>
   writeFile(tourPath, JSON.stringify(cachedTours), 'utf-8');
 
@@ -38,7 +26,7 @@ const checkBody = ({ body = {} }, res, next) => {
 
 const checkIsIn = (req, res, next) => {
   const { id } = req.params;
-  const tour = cachedTours.find(el => el.id == id);
+  const tour = cachedTours.find(el => el.id === +id);
 
   if (!tour) return sendFail(res, `Not Found (#${id})`, 404);
 
@@ -68,7 +56,7 @@ const createTour = async ({ body }, res) => {
 
 const deleteTour = async (req, res) => {
   const { id } = req.params;
-  cachedTours = cachedTours.filter(el => el.id != id);
+  cachedTours = cachedTours.filter(el => el.id !== +id);
 
   sendSuccess(res, cachedTours, 200);
   writeTours();
@@ -76,7 +64,7 @@ const deleteTour = async (req, res) => {
 
 const updateTour = async (req, res) => {
   cachedTours = cachedTours.map(tour => {
-    return tour.id == req.params.id
+    return tour.id === +req.params.id
       ? {
           ...tour,
           ...req.body,
@@ -86,4 +74,16 @@ const updateTour = async (req, res) => {
 
   sendSuccess(res, { ...req.tour, ...req.body });
   writeTours();
+};
+
+// prettier-ignore
+export { 
+  getAllTours, 
+  getTour, 
+  createTour, 
+  updateTour, 
+  deleteTour, 
+  checkBody,
+  checkId,
+  checkIsIn,
 };
