@@ -60,14 +60,10 @@ const createTour = async ({ body }, res) => {
     ...body,
   };
 
-  cachedTours.push(newTour);
+  cachedTours = [...cachedTours, newTour];
 
-  try {
-    await writeTours();
-    sendSuccess(res, cachedTours, 201);
-  } catch {
-    res.end('Error Occured');
-  }
+  sendSuccess(res, cachedTours, 201);
+  writeTours(); // do not have to 'await' because all handlers deals toursData as a variable
 };
 
 const deleteTour = async (req, res) => {
@@ -75,7 +71,7 @@ const deleteTour = async (req, res) => {
   cachedTours = cachedTours.filter(el => el.id != id);
 
   sendSuccess(res, cachedTours, 200);
-  writeTours(); // do not have to 'await' because all handlers deals toursData as a variable
+  writeTours();
 };
 
 const updateTour = async (req, res) => {
