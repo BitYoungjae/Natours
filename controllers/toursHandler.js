@@ -1,79 +1,59 @@
-import { promises } from 'fs';
-import { tours, dataPaths } from '../data.js';
+import Tour from '../model/tourModel.js';
 import { sendFail, sendSuccess } from '../lib/jsend.js';
 
-const { writeFile } = promises;
-const { tours: tourPath } = dataPaths;
-
-let cachedTours = tours;
-
-const writeTours = () =>
-  writeFile(tourPath, JSON.stringify(cachedTours), 'utf-8');
-
-const checkId = (req, res, next, val) => {
-  const isNum = /^[0-9]+$/.test(val);
-  if (!isNum) return sendFail(res, 'TypeError : Id must be numeric');
-
-  next();
+const getAllTours = async (req, res) => {
+  const tours = await Tour.find();
+  res.send(tours);
 };
 
-const checkBody = ({ body = {} }, res, next) => {
-  const { name, price } = body;
-  if (!name || !price) return sendFail(res, 'Missing name or price');
-
-  next();
-};
-
-const checkIsIn = (req, res, next) => {
+const getTour = async (req, res) => {
   const { id } = req.params;
-  const tour = cachedTours.find(el => el.id === +id);
-
-  if (!tour) return sendFail(res, `Not Found (#${id})`, 404);
-
-  req.tour = tour;
-  next();
-};
-
-const getAllTours = (req, res) => sendSuccess(res, cachedTours);
-
-const getTour = ({ tour }, res) => {
-  sendSuccess(res, tour);
+  try {
+    const tour = await Tour.findOne({ _id: id });
+    sendSuccess(res, tour);
+  } catch (e) {
+    sendFail(res, e.message);
+  }
 };
 
 const createTour = async ({ body }, res) => {
-  const newId = cachedTours[cachedTours.length - 1].id + 1;
+  try {
+    await Tour.create(body);
+  } catch (e) {
+    return sendFail(res, e.message);
+  }
 
-  const newTour = {
-    id: newId,
-    ...body,
-  };
-
-  cachedTours = [...cachedTours, newTour];
-
-  sendSuccess(res, cachedTours, 201);
-  writeTours(); // do not have to 'await' because all handlers deals toursData as a variable
+  res.send();
 };
 
 const deleteTour = async (req, res) => {
   const { id } = req.params;
-  cachedTours = cachedTours.filter(el => el.id !== +id);
 
-  sendSuccess(res, cachedTours, 200);
-  writeTours();
+  try {
+    await Tour.deleteOne({
+      _id: id,
+    });
+  } catch (e) {
+    return sendFail(res, e.message);
+  }
+
+  sendSuccess(res, `${id} removed sucessfully`);
 };
 
 const updateTour = async (req, res) => {
-  cachedTours = cachedTours.map(tour => {
-    return tour.id === +req.params.id
-      ? {
-          ...tour,
-          ...req.body,
-        }
-      : tour;
-  });
+  const { id } = req.params;
+  try {
+    await Tour.updateOne(
+      {
+        _id: id,
+      },
+      req.body,
+    );
+  } catch (e) {
+    return sendFail(res, e.message);
+  }
 
-  sendSuccess(res, { ...req.tour, ...req.body });
-  writeTours();
+  sendSuccess(res, `${id} updated succesfully`);
 };
 
 // prettier-ignore
@@ -83,7 +63,4 @@ export {
   createTour, 
   updateTour, 
   deleteTour, 
-  checkBody,
-  checkId,
-  checkIsIn,
 };
