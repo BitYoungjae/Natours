@@ -10,6 +10,7 @@ const getTour = async (req, res) => {
   const { id } = req.params;
   try {
     const tour = await Tour.findOne({ _id: id });
+    if (!tour) throw new Error(`Not Found (id : ${id})`);
     sendSuccess(res, tour);
   } catch (e) {
     sendFail(res, e.message);
