@@ -21,14 +21,23 @@ const DB = DATABASE
   DATABASE_DBNAME,
 );
 
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then(() => console.log('DB Connection successful!'));
+mongoose.connect(DB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('DB Connection successful!');
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Disconnected');
+});
+
+process.on('SIGINT', mongoose.disconnect);
+process.on('exit', mongoose.disconnect);
 
 import('./app.js').then(({ default: app }) => {
   app.listen(PORT, () => {

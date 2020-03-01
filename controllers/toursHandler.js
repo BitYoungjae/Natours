@@ -17,10 +17,21 @@ const getTour = async (req, res) => {
   }
 };
 
+const searchTour = async (req, res) => {
+  const { text } = req.params;
+  try {
+    const tours = await Tour.findByTourText(text);
+    if (!tours.length) throw new Error(`Not Found (search : ${text})`);
+    sendSuccess(res, tours);
+  } catch (e) {
+    sendFail(res, e.message);
+  }
+};
+
 const createTour = async ({ body }, res) => {
   try {
     const newTour = await Tour.create(body);
-    sendSuccess(res, newTour);
+    sendSuccess(res, newTour, 201);
   } catch (e) {
     return sendFail(res, e.message);
   }
@@ -43,17 +54,15 @@ const deleteTour = async (req, res) => {
 const updateTour = async (req, res) => {
   const { id } = req.params;
   try {
-    await Tour.updateOne(
-      {
-        _id: id,
-      },
-      req.body,
-    );
+    const tour = await Tour.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    }).exec();
+    if (!tour) throw new Error(`Not Found (id : ${id})`);
+    return sendSuccess(res, tour);
   } catch (e) {
     return sendFail(res, e.message);
   }
-
-  sendSuccess(res, `${id} updated succesfully`);
 };
 
 // prettier-ignore
@@ -62,5 +71,6 @@ export {
   getTour, 
   createTour, 
   updateTour, 
-  deleteTour, 
+  deleteTour,
+  searchTour
 };

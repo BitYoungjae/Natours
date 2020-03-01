@@ -16,6 +16,12 @@ const tourSchema = new mongoose.Schema({
   },
 });
 
+tourSchema.index({ name: 'text' });
+
+tourSchema.statics.findByTourText = function(text) {
+  return this.find({ $text: { $search: text } });
+};
+
 const Tour = mongoose.model('Tour', tourSchema);
 
 export default Tour;

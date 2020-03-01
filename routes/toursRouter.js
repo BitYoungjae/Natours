@@ -5,6 +5,7 @@ import {
   updateTour,
   deleteTour,
   createTour,
+  searchTour,
 } from '../controllers/toursHandler.js';
 
 const router = express.Router();
@@ -19,5 +20,7 @@ router
   .get(getTour)
   .delete(deleteTour)
   .patch(updateTour);
+
+router.route('/search/:text').get(searchTour);
 
 export default router;
